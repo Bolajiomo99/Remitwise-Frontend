@@ -26,9 +26,56 @@
     "failed_fetch_total_premium": "Failed to compute total premium",
     "address_signature_required": "Address and signature are required",
     "nonce_expired": "Nonce expired or missing. Please request a new nonce.",
-    "signature_verification_failed": "Signature verification failed"
-  },
-  "transactionHistory": {
+    "signature_verification_failed": "Signature verification failed",
+    "goal_name_required": "Goal name is required",
+    "goal_id_required": "Goal ID is required",
+    "goal_description_invalid": "Invalid description",
+    "goal_name_too_long": "Goal name cannot exceed 100 characters",
+    "goal_description_too_long": "Goal description cannot exceed 200 characters",
+    "goal_amount_positive": "Amount must be positive",
+    "goal_date_future": "Target date must be in the future",
+    "goal_invalid_date": "Invalid date format"
+    },
+    "savingsGoals": {
+    "title": "Savings Goals",
+    "subtitle": "Track and achieve your financial dreams",
+    "newGoal": "New Goal",
+    "editGoal": "Edit Goal",
+    "createGoal": "Create Goal",
+    "modal": {
+      "createTitle": "Create New Goal",
+      "editTitle": "Edit Savings Goal",
+      "titleLabel": "Goal Title",
+      "titlePlaceholder": "e.g. Children's Education",
+      "descriptionLabel": "Description (Optional)",
+      "descriptionPlaceholder": "What are you saving for?",
+      "amountLabel": "Target Amount (USDC)",
+      "dateLabel": "Target Date",
+      "iconLabel": "Choose Icon"
+    },
+    "stats": {
+      "totalGoals": "Total Goals",
+      "totalTarget": "Total Target",
+      "totalSaved": "Total Saved"
+    },
+    "card": {
+      "addFunds": "Add Funds",
+      "edit": "Edit",
+      "target": "Target",
+      "remaining": "{{amount}} remaining",
+      "needMore": "Need {{amount}} more",
+      "complete": "All set — target reached",
+      "daysLeft": "{{count}} days left",
+      "overdue": "Overdue",
+      "goalMet": "Goal met",
+      "nearComplete": "Almost there",
+      "onTrack": "On track",
+      "noDeadline": "No deadline"
+    }
+
+    },
+    "transactionHistory": {
+
     "title": "Transaction History",
     "resultsCount": "{{count}} transactions found",
     "resultsCountZero": "No transactions found",
