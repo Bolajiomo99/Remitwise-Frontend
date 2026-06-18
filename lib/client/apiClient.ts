@@ -69,7 +69,16 @@ async function request(url: string, options?: ApiClientOptions): Promise<Respons
     
     // Check if session expired
     if (await sessionHandler.isSessionExpired(response)) {
-      // Get current path for post-auth redirect
+      if (!options?._isRetry) {
+        // Attempt to refresh session
+        const refreshed = await sessionHandler.refreshSession();
+        if (refreshed) {
+          // Retry original request once
+          return request(url, { ...options, _isRetry: true });
+        }
+      }
+
+      // If refresh failed or already retried, trigger session expiry flow
       const currentPath = typeof window !== 'undefined' ? window.location.pathname : undefined;
       sessionHandler.handleSessionExpiry(currentPath);
       return null;

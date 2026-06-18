@@ -8,6 +8,7 @@ import Button from "./components/transaction-history-button";
 import { Download, FilterIcon, Loader2 } from "lucide-react";
 import { TransactionItem } from '@/lib/remittance/horizon';
 import { useClientTranslator } from '@/lib/i18n/client';
+import { apiClient } from '@/lib/client/apiClient';
 
 const TransactionHistoryPage = () => {
   const { t } = useClientTranslator();
@@ -33,7 +34,9 @@ const TransactionHistoryPage = () => {
         params.append('status', statusFilter);
       }
 
-      const response = await fetch(`/api/v1/remittance/history?${params}`);
+      const response = await apiClient.get(`/api/v1/remittance/history?${params}`);
+      if (!response) return; // Handled by session expiry flow
+
       if (!response.ok) {
         throw new Error(t('transactionHistory.alerts.fetchFailed'));
       }
