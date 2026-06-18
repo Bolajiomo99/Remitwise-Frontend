@@ -6,6 +6,7 @@ import { DensityProvider } from "@/lib/context/DensityContext";
 import { ToastProvider } from "@/lib/context/ToastContext";
 import ToastRegion from "@/components/ToastRegion";
 import SessionExpiryProvider from "@/components/SessionExpiryProvider";
+import { WalletProvider } from "stellar-wallet-kit";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,16 +24,18 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} starry-bg min-h-screen`}>
-        <ToastProvider>
-          <DensityProvider>
-            <SessionExpiryProvider>
-              <LayoutWrapper>
-                {children}
-              </LayoutWrapper>
-              <ToastRegion />
-            </SessionExpiryProvider>
-          </DensityProvider>
-        </ToastProvider>
+        <WalletProvider>
+          <ToastProvider>
+            <DensityProvider>
+              <SessionExpiryProvider>
+                <LayoutWrapper>
+                  {children}
+                </LayoutWrapper>
+                <ToastRegion />
+              </SessionExpiryProvider>
+            </DensityProvider>
+          </ToastProvider>
+        </WalletProvider>
       </body>
     </html>
   );
