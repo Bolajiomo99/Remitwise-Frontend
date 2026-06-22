@@ -11,8 +11,12 @@ import { ActionState } from "@/lib/auth/middleware";
 import { useFormAction } from "@/lib/hooks/useFormAction";
 import AsyncOperationsPanel from "@/components/AsyncOperationsPanel";
 import AsyncSubmissionStatus from "@/components/AsyncSubmissionStatus";
+<<<<<<< HEAD
+import { apiClient } from "@/lib/client/apiClient";
+import { Bill } from "@/lib/contracts/bill-payments";
+import { WidgetErrorState } from "@/components/ui/WidgetStates";
+import { SkeletonList } from "@/components/ui/Skeleton";
 import { useToast } from "@/lib/context/ToastContext";
-import { mockBills } from "@/lib/mockdata/bills";
 
 type AddBillResponse = ActionState & {
 	name?: string;
@@ -129,6 +133,57 @@ export default function Bills() {
 		}
 	}, [toast]);
 
+	const [bills, setBills] = useState<Bill[]>([]);
+	const [stats, setStats] = useState<any>(null);
+	const [isLoading, setIsLoading] = useState(true);
+	const [error, setError] = useState<Error | null>(null);
+
+	const fetchBillsData = async () => {
+		setIsLoading(true);
+		setError(null);
+		try {
+			const [billsRes, statsRes] = await Promise.all([
+				apiClient.get('/api/bills'),
+				apiClient.get('/api/bills/total-unpaid')
+			]);
+			
+			if (!billsRes || !statsRes) throw new Error("Session expired");
+			if (!billsRes.ok || !statsRes.ok) throw new Error("Failed to load bills data");
+			
+			const billsJson = await billsRes.json();
+			const statsJson = await statsRes.json();
+			
+			const fetchedBills: Bill[] = billsJson.data?.bills || [];
+			const fetchedStats = statsJson.data;
+
+			setBills(fetchedBills);
+
+			const paidBills = fetchedBills.filter((b: Bill) => b.status === 'paid');
+			const paidAmount = paidBills.reduce((acc: number, b: Bill) => acc + b.amount, 0);
+			const overdueCount = fetchedBills.filter((b: Bill) => b.status === 'overdue' || b.status === 'urgent').length;
+
+			setStats({
+				totalUnpaid: {
+					amount: fetchedStats?.totalUnpaid?.toLocaleString() || '0',
+					pendingCount: fetchedStats?.count || 0
+				},
+				overdueCount,
+				paidThisMonth: {
+					amount: paidAmount.toLocaleString(),
+					paymentCount: paidBills.length
+				}
+			});
+		} catch (err) {
+			setError(err instanceof Error ? err : new Error("Unknown error"));
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	useEffect(() => {
+		fetchBillsData();
+	}, []);
+
 	function handleAddBill() {
 		formSectionRef.current?.scrollIntoView({
 			behavior: "smooth",
@@ -147,17 +202,34 @@ export default function Bills() {
 			/>
 
 			<main className='mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-8 lg:px-8'>
-				<section className='mb-8'>
-					<BillPaymentsStatsCards />
-				</section>
+				{error ? (
+					<div className="mb-8">
+						<WidgetErrorState 
+							title="Failed to load bills" 
+							message={error.message} 
+							onRetry={fetchBillsData} 
+						/>
+					</div>
+				) : isLoading ? (
+					<div className="mb-8 space-y-8">
+						<SkeletonList rows={3} variant="cards" />
+						<SkeletonList rows={3} variant="table" />
+					</div>
+				) : (
+					<>
+						<section className='mb-8'>
+							<BillPaymentsStatsCards stats={stats} />
+						</section>
 
-				<div className='mb-8'>
-					<UnpaidBillsSection />
-				</div>
+						<div className='mb-8'>
+							<UnpaidBillsSection bills={bills} />
+						</div>
 
-				<div className='mb-8'>
-					<RecentPaymentsSection />
-				</div>
+						<div className='mb-8'>
+							<RecentPaymentsSection bills={bills} />
+						</div>
+					</>
+				)}
 
 				<div className='grid gap-8 xl:grid-cols-[minmax(0,1.1fr)_360px] xl:items-start'>
 					<div
