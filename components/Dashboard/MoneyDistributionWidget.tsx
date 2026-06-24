@@ -92,7 +92,7 @@ interface MoneyDistributionWidgetProps {
   hasError?: boolean;
 }
 
-export default function MoneyDistributionWidget({
+function MoneyDistributionWidget({
   distributionData = data,
   hasError = false,
 }: MoneyDistributionWidgetProps) {
@@ -225,3 +225,5 @@ export default function MoneyDistributionWidget({
     </section>
   );
 }
+
+export default memo(MoneyDistributionWidget);

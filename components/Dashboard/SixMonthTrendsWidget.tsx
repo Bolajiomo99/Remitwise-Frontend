@@ -30,7 +30,7 @@ interface CustomLegendProps {
     }>
 }
 
-function CustomLegend({ payload }: CustomLegendProps) {
+const CustomLegend = memo(function CustomLegend({ payload }: CustomLegendProps) {
     return (
         <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mt-4">
             {payload?.map((entry, index) => (
@@ -49,7 +49,7 @@ function CustomLegend({ payload }: CustomLegendProps) {
             ))}
         </div>
     )
-}
+})
 
 interface SummaryCardProps {
     icon: React.ReactNode
@@ -181,14 +181,9 @@ export default function SixMonthTrendsWidget() {
                             width={45}
                         />
                         <Tooltip
-                            contentStyle={{
-                                backgroundColor: '#1a1a1a',
-                                border: '1px solid rgba(255, 255, 255, 0.1)',
-                                borderRadius: '8px',
-                                color: '#fff'
-                            }}
-                            labelStyle={{ color: '#fff' }}
-                            formatter={(value) => [`$${Number(value).toLocaleString()}`, '']}
+                            contentStyle={TOOLTIP_CONTENT_STYLE}
+                            labelStyle={TOOLTIP_LABEL_STYLE}
+                            formatter={tooltipFormatter}
                         />
                         <Legend content={<CustomLegend />} />
                         <Line
@@ -196,32 +191,32 @@ export default function SixMonthTrendsWidget() {
                             dataKey="remittances"
                             stroke={COLORS.remittances}
                             strokeWidth={3}
-                            dot={{ fill: COLORS.remittances, stroke: COLORS.remittances, strokeWidth: 3, r: 4 }}
-                            activeDot={{ r: 6 }}
+                            dot={DOT_REMITTANCES}
+                            activeDot={ACTIVE_DOT}
                         />
                         <Line
                             type="monotone"
                             dataKey="savings"
                             stroke={COLORS.savings}
                             strokeWidth={3}
-                            dot={{ fill: COLORS.savings, stroke: COLORS.savings, strokeWidth: 3, r: 4 }}
-                            activeDot={{ r: 6 }}
+                            dot={DOT_SAVINGS}
+                            activeDot={ACTIVE_DOT}
                         />
                         <Line
                             type="monotone"
                             dataKey="bills"
                             stroke={COLORS.bills}
                             strokeWidth={3}
-                            dot={{ fill: COLORS.bills, stroke: COLORS.bills, strokeWidth: 3, r: 4 }}
-                            activeDot={{ r: 6 }}
+                            dot={DOT_BILLS}
+                            activeDot={ACTIVE_DOT}
                         />
                         <Line
                             type="monotone"
                             dataKey="insurance"
                             stroke={COLORS.insurance}
                             strokeWidth={3}
-                            dot={{ fill: COLORS.insurance, stroke: COLORS.insurance, strokeWidth: 3, r: 4 }}
-                            activeDot={{ r: 6 }}
+                            dot={DOT_INSURANCE}
+                            activeDot={ACTIVE_DOT}
                         />
                     </LineChart>
                 </ResponsiveContainer>
@@ -235,20 +230,20 @@ export default function SixMonthTrendsWidget() {
             {/* Summary Cards Section */}
             <div className="w-full border-t border-[rgba(255,255,255,0.08)] pt-[25px]">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <SummaryCard
+                    <MemoSummaryCard
                         icon={<TrendingUp className="w-4 h-4" />}
                         label="Highest Month"
                         value="Dec 2025"
                         subtitle="$5,630 total"
                         variant="highlight"
                     />
-                    <SummaryCard
+                    <MemoSummaryCard
                         icon={<Target className="w-4 h-4" />}
                         label="Average"
                         value="$5,395"
                         subtitle="Per month"
                     />
-                    <SummaryCard
+                    <MemoSummaryCard
                         icon={<FileText className="w-4 h-4" />}
                         label="Growth"
                         value="+15.7%"
@@ -259,4 +254,4 @@ export default function SixMonthTrendsWidget() {
             </div>
         </div>
     )
-}
+})
