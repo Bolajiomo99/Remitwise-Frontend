@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useId, useMemo, useState } from "react";
+import { useCallback, useId, useMemo, useState, memo } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { Clock, PieChart as PieChartIcon } from "lucide-react";
 import WidgetEmptyState from "@/components/ui/WidgetEmptyState";

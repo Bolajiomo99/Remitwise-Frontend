@@ -64,7 +64,15 @@ All pages live under `app/` and use the Next.js App Router convention (`page.tsx
 /tutorial                app/tutorial/page.tsx
 /tutorial/[tutorialId]   app/tutorial/[tutorialId]/page.tsx
 /tutorial/[tutorialId]/chapter/[chapterId]  app/tutorial/[tutorialId]/chapter/[chapterId]/page.tsx
+/* (no match)           app/not-found.tsx          — 404 page with primary navigation links
 ```
+
+**404 handling:** `app/not-found.tsx` is the Next.js App Router [not-found convention](https://nextjs.org/docs/app/api-reference/file-conventions/not-found).
+It is rendered automatically whenever `notFound()` is called inside a Server Component
+or when no route matches the incoming URL.  The page renders the six primary navigation
+links (Send, Dashboard, Bills, Insurance, Family, Settings) plus a "Go to Home" call-to-
+action so users can self-recover without using the browser back button.  It uses only
+design tokens from `tailwind.config.js` — no hardcoded colours, spacing, or radii.
 
 The shared layout (`app/layout.tsx`) wraps every page with providers, fonts, and the global nav.
 

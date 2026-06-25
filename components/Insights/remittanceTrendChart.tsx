@@ -36,6 +36,7 @@ function useReducedMotion() {
  * @property transactions Number of transactions in the period.
  */
 export interface TrendDataPoint {
+  [key: string]: string | number | undefined
   date: string
   amount: number
   transactions: number

@@ -17,6 +17,7 @@ import { generateBarChartLabel, generateBarChartSummary } from '@/lib/a11y'
 // ── Mock data ───────────────────────────
 
 export interface SpendingVsSavingsDataPoint {
+    [key: string]: string | number | undefined
     month: string
     spending: number
     savings: number
@@ -40,7 +41,8 @@ const GRID_COLOR = 'rgba(255,255,255,0.06)';
 const AXIS_COLOR = '#6b7280';
 
 // ── Custom tooltip ────────────────────────────────────────────────────────────
-function CustomTooltip({ active, payload, label }: TooltipContentProps<number, string>) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function CustomTooltip({ active, payload, label }: TooltipContentProps<any, any>) {
     if (!active || !payload?.length) return null
 
     return (
@@ -177,7 +179,7 @@ function SpendingVsSavingsChartInner({
                             width={40}
                             className="hidden sm:block"
                         />
-                        <Tooltip content={CustomTooltip} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
+                        <Tooltip content={CustomTooltip as any} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
                         <Bar dataKey="spending" name="spending" fill={SPENDING_COLOR} radius={[4, 4, 0, 0]} isAnimationActive={!reducedMotion} />
                         <Bar dataKey="savings" name="savings" fill={SAVINGS_COLOR} radius={[4, 4, 0, 0]} isAnimationActive={!reducedMotion} />
                     </BarChart>

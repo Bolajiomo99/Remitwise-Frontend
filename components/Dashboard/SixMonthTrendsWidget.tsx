@@ -10,7 +10,7 @@ import { useState, useCallback, memo } from 'react'
 import { generateTrendChartLabel, generateTrendChartSummary } from '@/lib/a11y/chart'
 
 // Sample data for the 6-month chart (Jul-Dec)
-const chartData = [
+const chartData: Record<string, string | number | undefined>[] = [
     { month: 'Jul', remittances: 2800, savings: 1200, bills: 420, insurance: 80 },
     { month: 'Aug', remittances: 3050, savings: 1350, bills: 400, insurance: 80 },
     { month: 'Sep', remittances: 3200, savings: 1400, bills: 380, insurance: 80 },
@@ -26,6 +26,33 @@ const COLORS = {
     bills: '#991B1B',
     insurance: '#7F1D1D',
 }
+
+// ─── Tooltip styles ──────────────────────────────────────────────────────────
+const TOOLTIP_CONTENT_STYLE: React.CSSProperties = {
+    backgroundColor: '#0f0f0f',
+    border: '1px solid rgba(255,255,255,0.1)',
+    borderRadius: '8px',
+    color: '#ffffff',
+    fontSize: '12px',
+}
+
+const TOOLTIP_LABEL_STYLE: React.CSSProperties = {
+    color: 'rgba(255,255,255,0.6)',
+    fontWeight: 600,
+    marginBottom: '4px',
+}
+
+const tooltipFormatter = (value: unknown, name: string | number | undefined): [string, string] => [
+    typeof value === 'number' ? `$${value.toLocaleString()}` : String(value ?? ''),
+    name != null ? String(name).charAt(0).toUpperCase() + String(name).slice(1) : '',
+]
+
+// ─── Dot styles ───────────────────────────────────────────────────────────────
+const DOT_REMITTANCES = { r: 3, fill: '#DC2626', strokeWidth: 0 }
+const DOT_SAVINGS     = { r: 3, fill: '#B91C1C', strokeWidth: 0 }
+const DOT_BILLS       = { r: 3, fill: '#991B1B', strokeWidth: 0 }
+const DOT_INSURANCE   = { r: 3, fill: '#7F1D1D', strokeWidth: 0 }
+const ACTIVE_DOT      = { r: 5, strokeWidth: 2, stroke: 'rgba(255,255,255,0.3)' }
 
 interface CustomLegendProps {
     payload?: Array<{

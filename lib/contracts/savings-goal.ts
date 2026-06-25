@@ -151,4 +151,4 @@ export async function isGoalCompleted(goalId: string): Promise<boolean> {
 }
 
 // Re-export resolved passphrase for callers that need it when signing transactions.
-export { getNetworkPassphrase };
+export { getNetworkPassphrase } from "@/lib/soroban/client";
