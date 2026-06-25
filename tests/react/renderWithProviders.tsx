@@ -12,8 +12,9 @@ export function renderWithProviders(
   } = {},
 ) {
   // DensityProvider reads from localStorage on mount; keep deterministic.
-  // jsdom localStorage is available.
-  window.localStorage.setItem("display-density", density);
+  if (typeof window !== "undefined" && window.localStorage) {
+    window.localStorage.setItem("display-density", density);
+  }
 
   return render(
     <DensityProvider>
