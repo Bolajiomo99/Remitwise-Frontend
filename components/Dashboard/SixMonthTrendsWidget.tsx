@@ -8,6 +8,8 @@ import WidgetEmptyState from '@/components/ui/WidgetEmptyState'
 import WidgetErrorState from '@/components/ui/WidgetErrorState'
 import { useState, useCallback, memo } from 'react'
 import { generateTrendChartLabel, generateTrendChartSummary } from '@/lib/a11y/chart'
+import { useWidgetDeepLink } from '@/lib/hooks/useWidgetDeepLink'
+import { WIDGET_IDS } from '@/lib/config/widgets'
 
 // Sample data for the 6-month chart (Jul-Dec)
 const chartData: Record<string, string | number | undefined>[] = [
@@ -101,7 +103,6 @@ function SummaryCard({ icon, label, value, subtitle, variant = 'default', valueC
                 : 'bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.08)]'
                 }`}
         >
-            {/* Label row */}
             <div className="flex items-center gap-2">
                 <div className={isHighlight ? 'text-[#DC2626]' : 'text-[rgba(255,255,255,0.6)]'}>
                     {icon}
@@ -114,15 +115,13 @@ function SummaryCard({ icon, label, value, subtitle, variant = 'default', valueC
                 </span>
             </div>
 
-            {/* Value */}
             <div
                 className="text-xl font-bold leading-7 tracking-[-0.45px]"
-                style={{ color: valueColor || (isHighlight ? '#FFFFFF' : '#FFFFFF') }}
+                style={{ color: valueColor || '#FFFFFF' }}
             >
                 {value}
             </div>
 
-            {/* Subtitle */}
             <div className="text-xs font-normal leading-4 text-[rgba(255,255,255,0.6)]">
                 {subtitle}
             </div>
@@ -145,7 +144,9 @@ export default memo(function SixMonthTrendsWidget({ isLoading = false, hasError 
     const [retryKey, setRetryKey] = useState(0)
     const handleRetry = useCallback(() => setRetryKey((k) => k + 1), [])
 
-    // Generate accessible label and summary from chart data
+    // Deep-link: scrolls & highlights this widget when ?widget=six-month-trends
+    const widgetRef = useWidgetDeepLink(WIDGET_IDS.SIX_MONTH_TRENDS)
+
     const chartLabel = useMemo(
         () => generateTrendChartLabel("6-Month Trends", chartData, ["remittances", "savings", "bills", "insurance"]),
         []
@@ -159,10 +160,10 @@ export default memo(function SixMonthTrendsWidget({ isLoading = false, hasError 
     if (isLoading) {
         return (
             <div
+                ref={widgetRef}
+                id={WIDGET_IDS.SIX_MONTH_TRENDS}
                 className="flex flex-col items-start pt-[25px] px-[25px] pb-[16px] gap-6 rounded-2xl border border-[rgba(255,255,255,0.08)] w-full max-w-[928px]"
-                style={{
-                    background: 'linear-gradient(180deg, #0F0F0F 0%, #0A0A0A 100%)'
-                }}
+                style={{ background: 'linear-gradient(180deg, #0F0F0F 0%, #0A0A0A 100%)' }}
                 aria-busy="true"
                 aria-hidden="true"
             >
@@ -170,196 +171,85 @@ export default memo(function SixMonthTrendsWidget({ isLoading = false, hasError 
                     <div className="flex flex-col gap-1">
                         <div className="flex items-center gap-2">
                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                <path
-                                    d="M2 15L6 11L10 14L18 5"
-                                    stroke="#DC2626"
-                                    strokeWidth="1.67"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                />
-                                <path
-                                    d="M14 5H18V9"
-                                    stroke="#DC2626"
-                                    strokeWidth="1.67"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                />
+                                <path d="M2 15L6 11L10 14L18 5" stroke="#DC2626" strokeWidth="1.67" strokeLinecap="round" strokeLinejoin="round" />
+                                <path d="M14 5H18V9" stroke="#DC2626" strokeWidth="1.67" strokeLinecap="round" strokeLinejoin="round" />
                             </svg>
-                            <h2 className="text-xl font-bold leading-7 tracking-[-0.45px] text-white">
-                                6-Month Trends
-                            </h2>
+                            <h2 className="text-xl font-bold leading-7 tracking-[-0.45px] text-white">6-Month Trends</h2>
                         </div>
                     </div>
                 </div>
-                <div className="w-full">
-                    <SkeletonChart type="line" />
-                </div>
+                <div className="w-full"><SkeletonChart type="line" /></div>
             </div>
         );
     }
 
     if (hasError) {
         return (
-            <div className="rounded-2xl border border-[rgba(255,255,255,0.08)] w-full max-w-[928px] p-6 bg-[#0f0f0f]">
-                <WidgetErrorState
-                    message="We couldn't load your trends data. Please try again."
-                    onRetry={handleRetry}
-                />
+            <div ref={widgetRef} id={WIDGET_IDS.SIX_MONTH_TRENDS} className="rounded-2xl border border-[rgba(255,255,255,0.08)] w-full max-w-[928px] p-6 bg-[#0f0f0f]">
+                <WidgetErrorState message="We couldn't load your trends data. Please try again." onRetry={handleRetry} />
             </div>
         );
     }
 
     if (isEmpty) {
         return (
-            <div className="rounded-2xl border border-[rgba(255,255,255,0.08)] w-full max-w-[928px] p-6 bg-[#0f0f0f]">
-                <WidgetEmptyState
-                    icon={TrendingUp}
-                    title="No trends data yet"
-                    description="Keep using Remitwise to see your financial patterns over time."
-                />
+            <div ref={widgetRef} id={WIDGET_IDS.SIX_MONTH_TRENDS} className="rounded-2xl border border-[rgba(255,255,255,0.08)] w-full max-w-[928px] p-6 bg-[#0f0f0f]">
+                <WidgetEmptyState icon={TrendingUp} title="No trends data yet" description="Keep using Remitwise to see your financial patterns over time." />
             </div>
         );
     }
 
     return (
         <div
+            ref={widgetRef}
+            id={WIDGET_IDS.SIX_MONTH_TRENDS}
             className="flex flex-col items-start pt-[25px] px-[25px] pb-[16px] gap-6 rounded-2xl border border-[rgba(255,255,255,0.08)] w-full max-w-[928px]"
-            style={{
-                background: 'linear-gradient(180deg, #0F0F0F 0%, #0A0A0A 100%)'
-            }}
+            style={{ background: 'linear-gradient(180deg, #0F0F0F 0%, #0A0A0A 100%)' }}
         >
             {/* Header */}
             <div className="flex flex-row items-center justify-between gap-4 w-full">
                 <div className="flex flex-col gap-1">
                     <div className="flex items-center gap-2">
-                        {/* Trend Icon - matching Figma exactly */}
                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path
-                                d="M2 15L6 11L10 14L18 5"
-                                stroke="#DC2626"
-                                strokeWidth="1.67"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                            />
-                            <path
-                                d="M14 5H18V9"
-                                stroke="#DC2626"
-                                strokeWidth="1.67"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                            />
+                            <path d="M2 15L6 11L10 14L18 5" stroke="#DC2626" strokeWidth="1.67" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M14 5H18V9" stroke="#DC2626" strokeWidth="1.67" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
-                        <h2 className="text-xl font-bold leading-7 tracking-[-0.45px] text-white">
-                            6-Month Trends
-                        </h2>
+                        <h2 className="text-xl font-bold leading-7 tracking-[-0.45px] text-white">6-Month Trends</h2>
                     </div>
                     <p className="text-sm font-normal leading-5 tracking-[-0.15px] text-[rgba(255,255,255,0.5)]">
                         Track your financial patterns
                     </p>
                 </div>
-
-                {/* View Details Button */}
-                <button
-                    className="h-[30px] px-[13px] text-xs font-semibold leading-4 text-white bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.08)] rounded-[10px] hover:bg-[rgba(255,255,255,0.1)] transition-colors shrink-0 whitespace-nowrap"
-                >
+                <button className="h-[30px] px-[13px] text-xs font-semibold leading-4 text-white bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.08)] rounded-[10px] hover:bg-[rgba(255,255,255,0.1)] transition-colors shrink-0 whitespace-nowrap">
                     View Details
                 </button>
             </div>
 
-            {/* Line Chart - 320px height */}
+            {/* Chart */}
             <div className="w-full h-[280px] sm:h-[320px]" role="img" aria-label={chartLabel}>
                 <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={chartData} margin={{ top: 5, right: 5, left: -10, bottom: 5 }} aria-hidden="true">
-                        <CartesianGrid
-                            strokeDasharray="3 3"
-                            stroke="rgba(255, 255, 255, 0.063)"
-                            vertical={true}
-                        />
-                        <XAxis
-                            dataKey="month"
-                            axisLine={{ stroke: 'rgba(255, 255, 255, 0.25)' }}
-                            tickLine={{ stroke: 'rgba(255, 255, 255, 0.25)' }}
-                            tick={{ fill: 'rgba(255, 255, 255, 0.376)', fontSize: 12, fontWeight: 400 }}
-                        />
-                        <YAxis
-                            axisLine={{ stroke: 'rgba(255, 255, 255, 0.25)' }}
-                            tickLine={{ stroke: 'rgba(255, 255, 255, 0.25)' }}
-                            tick={{ fill: 'rgba(255, 255, 255, 0.376)', fontSize: 12, fontWeight: 400 }}
-                            tickFormatter={(value) => `$${value}`}
-                            domain={[0, 3400]}
-                            ticks={[0, 850, 1700, 2550, 3400]}
-                            width={45}
-                        />
-                        <Tooltip
-                            contentStyle={TOOLTIP_CONTENT_STYLE}
-                            labelStyle={TOOLTIP_LABEL_STYLE}
-                            formatter={tooltipFormatter}
-                        />
+                        <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.063)" vertical={true} />
+                        <XAxis dataKey="month" axisLine={{ stroke: 'rgba(255, 255, 255, 0.25)' }} tickLine={{ stroke: 'rgba(255, 255, 255, 0.25)' }} tick={{ fill: 'rgba(255, 255, 255, 0.376)', fontSize: 12, fontWeight: 400 }} />
+                        <YAxis axisLine={{ stroke: 'rgba(255, 255, 255, 0.25)' }} tickLine={{ stroke: 'rgba(255, 255, 255, 0.25)' }} tick={{ fill: 'rgba(255, 255, 255, 0.376)', fontSize: 12, fontWeight: 400 }} tickFormatter={(value) => `$${value}`} domain={[0, 3400]} ticks={[0, 850, 1700, 2550, 3400]} width={45} />
+                        <Tooltip contentStyle={TOOLTIP_CONTENT_STYLE} labelStyle={TOOLTIP_LABEL_STYLE} formatter={tooltipFormatter} />
                         <Legend content={<CustomLegend />} />
-                        <Line
-                            type="monotone"
-                            dataKey="remittances"
-                            stroke={COLORS.remittances}
-                            strokeWidth={3}
-                            dot={DOT_REMITTANCES}
-                            activeDot={ACTIVE_DOT}
-                        />
-                        <Line
-                            type="monotone"
-                            dataKey="savings"
-                            stroke={COLORS.savings}
-                            strokeWidth={3}
-                            dot={DOT_SAVINGS}
-                            activeDot={ACTIVE_DOT}
-                        />
-                        <Line
-                            type="monotone"
-                            dataKey="bills"
-                            stroke={COLORS.bills}
-                            strokeWidth={3}
-                            dot={DOT_BILLS}
-                            activeDot={ACTIVE_DOT}
-                        />
-                        <Line
-                            type="monotone"
-                            dataKey="insurance"
-                            stroke={COLORS.insurance}
-                            strokeWidth={3}
-                            dot={DOT_INSURANCE}
-                            activeDot={ACTIVE_DOT}
-                        />
+                        <Line type="monotone" dataKey="remittances" stroke={COLORS.remittances} strokeWidth={3} dot={DOT_REMITTANCES} activeDot={ACTIVE_DOT} />
+                        <Line type="monotone" dataKey="savings"     stroke={COLORS.savings}     strokeWidth={3} dot={DOT_SAVINGS}     activeDot={ACTIVE_DOT} />
+                        <Line type="monotone" dataKey="bills"       stroke={COLORS.bills}       strokeWidth={3} dot={DOT_BILLS}       activeDot={ACTIVE_DOT} />
+                        <Line type="monotone" dataKey="insurance"   stroke={COLORS.insurance}   strokeWidth={3} dot={DOT_INSURANCE}   activeDot={ACTIVE_DOT} />
                     </LineChart>
                 </ResponsiveContainer>
             </div>
 
-            {/* Screen reader summary */}
-            <p className="sr-only" aria-live="polite">
-                {chartSummary}
-            </p>
+            <p className="sr-only" aria-live="polite">{chartSummary}</p>
 
-            {/* Summary Cards Section */}
+            {/* Summary Cards */}
             <div className="w-full border-t border-[rgba(255,255,255,0.08)] pt-[25px]">
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <MemoSummaryCard
-                        icon={<TrendingUp className="w-4 h-4" />}
-                        label="Highest Month"
-                        value="Dec 2025"
-                        subtitle="$5,630 total"
-                        variant="highlight"
-                    />
-                    <MemoSummaryCard
-                        icon={<Target className="w-4 h-4" />}
-                        label="Average"
-                        value="$5,395"
-                        subtitle="Per month"
-                    />
-                    <MemoSummaryCard
-                        icon={<FileText className="w-4 h-4" />}
-                        label="Growth"
-                        value="+15.7%"
-                        subtitle="vs. Jul 2025"
-                        valueColor="#DC2626"
-                    />
+                    <MemoSummaryCard icon={<TrendingUp className="w-4 h-4" />} label="Highest Month" value="Dec 2025" subtitle="$5,630 total" variant="highlight" />
+                    <MemoSummaryCard icon={<Target className="w-4 h-4" />} label="Average" value="$5,395" subtitle="Per month" />
+                    <MemoSummaryCard icon={<FileText className="w-4 h-4" />} label="Growth" value="+15.7%" subtitle="vs. Jul 2025" valueColor="#DC2626" />
                 </div>
             </div>
         </div>

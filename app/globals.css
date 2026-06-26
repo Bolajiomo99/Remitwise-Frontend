@@ -64,3 +64,27 @@ body {
     min-width: 88px;
   }
 }
+
+/* ─── Widget deep-link highlight ────────────────────────────────────────────
+ * Applied by useWidgetDeepLink when ?widget=<id> targets this element.
+ * Uses motion-safe so the pulse is suppressed for prefers-reduced-motion users.
+ * The animation runs once and removes the class via an animationend listener
+ * in the hook — no residual style is left on the element.
+ * ────────────────────────────────────────────────────────────────────────── */
+@keyframes widget-pulse {
+  0%   { box-shadow: 0 0 0 0   rgba(220, 38, 38, 0.55); }
+  50%  { box-shadow: 0 0 0 12px rgba(220, 38, 38, 0);    }
+  100% { box-shadow: 0 0 0 0   rgba(220, 38, 38, 0);     }
+}
+
+.widget-highlight {
+  outline: 2px solid rgba(220, 38, 38, 0.7);
+  outline-offset: 3px;
+  border-radius: inherit;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .widget-highlight {
+    animation: widget-pulse 1.4s ease-out 1 forwards;
+  }
+}
