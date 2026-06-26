@@ -36,7 +36,7 @@ The frontend includes placeholder pages and components for:
 
 Dashboard, Bills, and Insights now use route-level skeleton screens built from `components/ui/Skeleton.tsx` so primary panels load with stable layout blocks instead of ad-hoc spinners.
 
-Primary page-level CTAs and core flow submit or confirm buttons now expose stable `data-testid` hooks from `lib/cta-testids.ts` so Playwright specs and analytics wiring do not need to depend on visible text or class names.
+Fetch-driven widget surfaces on those screens now auto-retry failed read requests up to 3 times with exponential backoff before the inline "Try again" error CTA appears.
 
 ## Sentry
 

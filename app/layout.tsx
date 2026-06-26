@@ -1,9 +1,6 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import "./globals.css";
 import Providers from "@/components/Providers";
-
-const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "RemitWise - Smart Remittance & Financial Planning",
@@ -20,8 +17,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.className} starry-bg min-h-screen`}>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      <body className="starry-bg min-h-screen font-sans">
         <Providers>{children}</Providers>
       </body>
     </html>
