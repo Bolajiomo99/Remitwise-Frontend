@@ -340,6 +340,3 @@ Documentation updated per issue requirements.
 
 ## Issue #773 Fix
 Documentation updated per issue requirements.
-
-## Issue #770 Fix
-Documentation updated per issue requirements.
