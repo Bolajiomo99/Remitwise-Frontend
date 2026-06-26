@@ -14,26 +14,17 @@ import {
 } from 'recharts';
 import { INSIGHTS_PALETTE } from './palette';
 import { generateTrendChartLabel, generateTrendChartSummary } from '@/lib/a11y';
-const LINE_COLOR = INSIGHTS_PALETTE[0];
+import { usePrefersReducedMotion } from '@/lib/hooks/usePrefersReducedMotion';
 
-function useReducedMotion() {
-  if (typeof window === 'undefined') return false
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
-}
+const LINE_COLOR = INSIGHTS_PALETTE[0];
 
 // ── Mock data ─────────────────────────────────────────────────────────────────
 
 /**
  * A single point on the remittance trend timeline.
  *
- * The chart plots one entry per period (typically weekly), ordered oldest →
- * newest. `amount` drives the area/`YAxis` and the average `ReferenceLine`;
- * `date` is the `XAxis` category; `transactions` is surfaced in the tooltip and
- * the screen-reader summary only.
- *
- * @property date         Period label shown on the X axis (e.g. `"Sep 1"`).
- * @property amount       Remittance volume for the period, in USD.
- * @property transactions Number of transactions in the period.
+ * Index signature added so this type satisfies TrendChartDataPoint in
+ * @/lib/a11y/chartAccessibility, which requires dynamic key access.
  */
 export interface TrendDataPoint {
   [key: string]: string | number | undefined
@@ -97,21 +88,12 @@ interface RemittanceTrendChartProps {
   data?: TrendDataPoint[]
 }
 
-/**
- * Remittance volume area chart for the Insights surface.
- *
- * Renders a Recharts `AreaChart` of {@link TrendDataPoint} amounts over time,
- * with an average `ReferenceLine`, peak / vs-previous stats, a custom tooltip,
- * and an `sr-only` summary of every point. Animation is disabled for users who
- * prefer reduced motion. An empty `data` array renders a non-crashing empty
- * state rather than `NaN`/`-Infinity` stats.
- *
- * @param data Trend points consumed by the chart. See {@link TrendDataPoint}.
- */
 function RemittanceTrendChartInner({
   data = MOCK_TREND_DATA,
 }: RemittanceTrendChartProps) {
-  const reducedMotion = useReducedMotion()
+  // Use the canonical hook — reactive, SSR-safe, shared across the codebase.
+  const reducedMotion = usePrefersReducedMotion()
+
   const isEmpty = data.length === 0
   const total   = useMemo(() => data.reduce((s, d) => s + d.amount, 0), [data])
   const average = useMemo(() => (data.length ? Math.round(total / data.length) : 0), [total, data.length])
@@ -120,7 +102,6 @@ function RemittanceTrendChartInner({
   const prev    = useMemo(() => data[data.length - 2]?.amount ?? latest, [data, latest])
   const trend   = latest >= prev ? 'up' : 'down'
 
-  // Generate accessible label and summary
   const chartLabel = useMemo(
     () => generateTrendChartLabel("Remittance Trend", data, ["amount"]),
     [data]
@@ -227,7 +208,6 @@ function RemittanceTrendChartInner({
 
             <Tooltip content={<CustomTooltip />} cursor={{ stroke: 'rgba(255,255,255,0.1)', strokeWidth: 1 }} />
 
-            {/* Average reference line */}
             <ReferenceLine
               y={average}
               stroke="rgba(255,255,255,0.15)"
@@ -253,6 +233,7 @@ function RemittanceTrendChartInner({
           </AreaChart>
         </ResponsiveContainer>
       </div>
+
       {/* Screen‑reader summary */}
       <p className="sr-only" aria-live="polite">
         {chartSummary}
