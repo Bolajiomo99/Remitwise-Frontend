@@ -10,6 +10,7 @@ import { SkeletonList } from "@/components/ui/Skeleton";
 import PolicyDetail from "@/components/insurance/PolicyDetail";
 import NewPolicyForm from "@/components/forms/NewPolicyForm";
 import PageHeadingLink from "@/components/PageHeadingLink";
+import { useSeo } from "@/lib/hooks/useSeo";
 
 // ─── i18n stubs (replace with your real i18n hook) ───────────────────────────
 
@@ -85,6 +86,11 @@ interface PageState {
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function InsurancePage() {
+  useSeo({
+    title: "Micro-Insurance - RemitWise",
+    description: "Manage your active coverage policies and confirm premium payments",
+  });
+
   const [state, setState] = useState<PageState>({
     policies: [],
     loading: true,

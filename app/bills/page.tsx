@@ -18,6 +18,7 @@ import { WidgetErrorState } from "@/components/ui/WidgetStates";
 import { SkeletonList } from "@/components/ui/Skeleton";
 import { useToast } from "@/lib/context/ToastContext";
 import { CTA_TEST_IDS } from "@/lib/cta-testids";
+import { useSeo } from "@/lib/hooks/useSeo";
 
 type AddBillResponse = ActionState & {
 	name?: string;
@@ -104,6 +105,11 @@ function ordinalDay(day: string) {
 }
 
 export default function Bills() {
+	useSeo({
+		title: "Bill Payments - RemitWise",
+		description: "Plan and pay your regular bills seamlessly",
+	});
+
 	const formSectionRef = useRef<HTMLDivElement>(null);
 	const [state, formAction, pending] = useFormAction<AddBillResponse>("/api/bills");
 	const [isRecurring, setIsRecurring] = useState(false);
