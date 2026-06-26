@@ -123,7 +123,6 @@ export default function Bills() {
 	const [stats, setStats] = useState<any>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<Error | null>(null);
-	const [reloadKey, setReloadKey] = useState(0);
 
 	useEffect(() => {
 		const overdueBill = bills.find((b) => b.status === "overdue" || b.status === "urgent");
@@ -143,17 +142,39 @@ export default function Bills() {
 		}
 	}, [toast, bills]);
 
-	const fetchBillsData = useCallback((signal?: AbortSignal) => {
-		return runWidgetFetchWithRetry({
-			signal,
-			load: async () => {
-				const [billsRes, statsRes] = await Promise.all([
-					apiClient.get('/api/bills', { signal }),
-					apiClient.get('/api/bills/total-unpaid', { signal })
-				]);
+	const fetchBillsData = async () => {
+		setIsLoading(true);
+		setError(null);
+		try {
+			const [billsRes, statsRes] = await Promise.all([
+				apiClient.get('/api/bills'),
+				apiClient.get('/api/bills/total-unpaid')
+			]);
+			
+			if (!billsRes || !statsRes) throw new Error("Session expired");
+			if (!billsRes.ok || !statsRes.ok) throw new Error("Failed to load bills data");
+			
+			const billsJson = await billsRes.json();
+			const statsJson = await statsRes.json();
+			
+			const fetchedBills: Bill[] = billsJson.data?.bills || [];
+			const fetchedStats = statsJson.data;
 
-				if (!billsRes || !statsRes || !billsRes.ok || !statsRes.ok) {
-					throw new Error("Failed to load bills data");
+			setBills(fetchedBills);
+
+			const paidBills = fetchedBills.filter((b: Bill) => b.status === 'paid');
+			const paidAmount = paidBills.reduce((acc: number, b: Bill) => acc + b.amount, 0);
+			const overdueCount = fetchedBills.filter((b: Bill) => (b.status as string) === 'overdue' || (b.status as string) === 'urgent').length;
+
+			setStats({
+				totalUnpaid: {
+					amount: fetchedStats?.totalUnpaid?.toLocaleString() || '0',
+					pendingCount: fetchedStats?.count || 0
+				},
+				overdueCount,
+				paidThisMonth: {
+					amount: paidAmount.toLocaleString(),
+					paymentCount: paidBills.length
 				}
 
 				const billsJson = await billsRes.json();

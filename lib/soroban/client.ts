@@ -21,13 +21,14 @@ import { getSorobanNetworkPassphrase } from "@/lib/contracts/network-resolution"
 
 function getRpcUrl(): string {
   const url = process.env.SOROBAN_RPC_URL;
-  if (!url && process.env.NODE_ENV === "production") {
-    console.warn(
-      "SOROBAN_RPC_URL is not set. Falling back to the Stellar testnet RPC URL."
-    );
+  if (!url) {
+    if (process.env.NODE_ENV === "production") {
+      console.warn("SOROBAN_RPC_URL is not set; falling back to testnet URL.");
+    }
+    return "https://soroban-testnet.stellar.org";
   }
-  return url ?? "https://soroban-testnet.stellar.org";
-}
+  return url;
+})();
 
 /** How long (ms) to wait for a single RPC call before aborting. */
 const TIMEOUT_MS = 10_000;

@@ -34,7 +34,7 @@ The frontend includes placeholder pages and components for:
 
 ## Loading States
 
-Dashboard, Bills, and Insights now use route-level skeleton screens built from `components/ui/Skeleton.tsx` so primary panels load with stable layout blocks instead of ad-hoc spinners.
+Dashboard, Bills, and Insights now use route-level skeleton screens built from `components/ui/Skeleton.tsx` so primary panels load with stable layout blocks instead of ad-hoc spinners. For detailed guidelines and implementation patterns on all UI states (Default, Error, Disabled, and Loading), see [docs/component-states.md](docs/component-states.md).
 
 Fetch-driven widget surfaces on those screens now auto-retry failed read requests up to 3 times with exponential backoff before the inline "Try again" error CTA appears.
 
@@ -94,6 +94,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ```bash
 # Build for production
 npm run build
+npm run generate:types # Generate TypeScript types from OpenAPI spec
 
 # Start production server
 npm start
@@ -216,6 +217,7 @@ remitwise-frontend/
 │   └── auth.ts              # Auth middleware
 ├── docs/                    # Documentation
 │   ├── API_ROUTES.md        # API routes documentation
+│   ├── component-states.md  # Standard UI states (default, error, disabled, loading) guide
 │   └── contract-cache.md    # Contract caching architecture and guidelines
 ├── public/                  # Static assets
 └── package.json

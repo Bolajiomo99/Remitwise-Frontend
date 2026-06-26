@@ -14,7 +14,7 @@ import {
 } from 'recharts';
 import { INSIGHTS_PALETTE } from './palette';
 import { generateTrendChartLabel, generateTrendChartSummary } from '@/lib/a11y';
-import WidgetEmptyState from '@/components/ui/WidgetEmptyState';
+import type { TrendChartDataPoint } from '@/lib/a11y/chartAccessibility';
 const LINE_COLOR = INSIGHTS_PALETTE[0];
 
 
@@ -124,12 +124,12 @@ function RemittanceTrendChartInner({
 
   // Generate accessible label and summary
   const chartLabel = useMemo(
-    () => generateTrendChartLabel("Remittance Trend", data, ["amount"]),
+    () => generateTrendChartLabel("Remittance Trend", data as unknown as TrendChartDataPoint[], ["amount"]),
     [data]
   )
 
   const chartSummary = useMemo(
-    () => generateTrendChartSummary(data, ["amount"]),
+    () => generateTrendChartSummary(data as unknown as TrendChartDataPoint[], ["amount"]),
     [data]
   )
 
