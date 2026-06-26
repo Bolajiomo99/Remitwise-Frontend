@@ -200,6 +200,7 @@ export default function Bills() {
 				title='Bill Payments'
 				subtitle='Manage and track your recurring bills'
 				ctaLabel='Add Bill'
+				headingId='bills-page-heading'
 				onCtaClick={handleAddBill}
 				ctaTestId={CTA_TEST_IDS.page.billsPrimary}
 				showBottomDivider
