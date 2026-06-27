@@ -13,6 +13,7 @@ import { PieChart as PieChartIcon, Info } from 'lucide-react'
 import { INSIGHTS_PALETTE } from './palette'
 import { useClientTranslator } from '@/lib/i18n/client'
 import { buildChartImageLabel, buildChartSummary } from '@/lib/a11y/chart'
+import { usePrefersReducedMotion } from '@/lib/hooks/usePrefersReducedMotion'
 
 // ── Mock data ─────────────────────────────────────────────────────────────────
 
@@ -34,7 +35,7 @@ export const MOCK_CATEGORY_DATA: CategoryDataPoint[] = [
   { name: 'Emergency',      amount: 200,  percentage: 6  },
 ]
 
-const SLICE_COLORS = INSIGHTS_PALETTE.slice(0, 8); // use first 8 colors
+const SLICE_COLORS = INSIGHTS_PALETTE.slice(0, 8);
 
 const AXIS_COLOR = '#6b7280'
 
@@ -107,11 +108,6 @@ interface CategoryDonutChartProps {
   data?: CategoryDataPoint[]
 }
 
-function useReducedMotion() {
-  if (typeof window === 'undefined') return false
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches
-}
-
 function CategoryDonutChartInner({ data = MOCK_CATEGORY_DATA }: CategoryDonutChartProps) {
   const summaryId = useId()
   const { t } = useClientTranslator()
@@ -121,7 +117,8 @@ function CategoryDonutChartInner({ data = MOCK_CATEGORY_DATA }: CategoryDonutCha
 );
 const chartSummary = buildChartSummary(summaryItems, t);
   const [activeCategory, setActiveCategory] = useState<CategoryDataPoint | null>(null)
-  const reducedMotion = useReducedMotion()
+  // Use the canonical hook — reactive, SSR-safe, and shared across the codebase.
+  const reducedMotion = usePrefersReducedMotion()
 
   const total  = useMemo(() => data.reduce((s, d) => s + d.amount, 0), [data])
   const topCat = useMemo(() => data[0], [data])
@@ -167,6 +164,7 @@ const chartSummary = buildChartSummary(summaryItems, t);
                 paddingAngle={3}
                 dataKey="amount"
                 stroke="none"
+                isAnimationActive={!reducedMotion}
                 onMouseEnter={(_, index) => setActiveCategory(data[index])}
                 onMouseLeave={() => setActiveCategory(null)}
                 onClick={(_, index) =>
@@ -261,6 +259,7 @@ const chartSummary = buildChartSummary(summaryItems, t);
           </p>
         </div>
       )}
+
       {/* Screen‑reader summary for the chart */}
       <p id={summaryId} className="sr-only" aria-live="polite">
         {summaryText}

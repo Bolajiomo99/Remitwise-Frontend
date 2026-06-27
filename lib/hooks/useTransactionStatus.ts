@@ -36,6 +36,9 @@ export function useTransactionStatus(txHash: string | null, options: UseTransact
   
   const timerRef = useRef<NodeJS.Timeout>();
   const unmountedRef = useRef(false);
+  
+  // Create a mutable ref to hold the latest poll function to break the circular dependency loop
+  const pollRef = useRef<(currentAttempt: number) => Promise<void>>();
 
   useEffect(() => {
     unmountedRef.current = false;
@@ -44,6 +47,16 @@ export function useTransactionStatus(txHash: string | null, options: UseTransact
     };
   }, []);
 
+  // 1. scheduleNext now safely triggers the function stored in our mutable ref
+  const scheduleNext = useCallback((nextAttempt: number) => {
+    if (unmountedRef.current) return;
+    const delay = nextBackoffDelay(nextAttempt, baseDelayMs, maxDelayMs);
+    timerRef.current = setTimeout(() => {
+      if (pollRef.current) pollRef.current(nextAttempt);
+    }, delay);
+  }, [baseDelayMs, maxDelayMs]);
+
+  // 2. The core polling function logic
   const poll = useCallback(async (currentAttempt: number) => {
     if (!txHash || unmountedRef.current) return;
     
@@ -67,7 +80,6 @@ export function useTransactionStatus(txHash: string | null, options: UseTransact
       const data = await response.json();
       if (!response.ok) {
         setError(`status_${response.status}`);
-        // transient error, retry
         scheduleNext(currentAttempt + 1);
         return;
       }
@@ -80,7 +92,6 @@ export function useTransactionStatus(txHash: string | null, options: UseTransact
         return;
       }
       
-      // non-terminal, keep polling
       scheduleNext(currentAttempt + 1);
     } catch (err: any) {
       setError(err.message || "error");

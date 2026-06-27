@@ -16,6 +16,10 @@ import { buildChartImageLabel, buildChartSummary } from '@/lib/a11y/chart'
 
 // ── Mock data ───────────────────────────
 
+/**
+ * Index signature added so this type satisfies TrendChartDataPoint in
+ * @/lib/a11y/chartAccessibility, which requires dynamic key access.
+ */
 export interface SpendingVsSavingsDataPoint {
     [key: string]: string | number | undefined
     month: string
@@ -33,12 +37,12 @@ export const MOCK_SPENDING_VS_SAVINGS: SpendingVsSavingsDataPoint[] = [
     { month: 'Mar', spending: 3100, savings: 900 },
 ]
 
-// ── Color tokens — match the existing dark theme ──────────────────────────────
+// ── Color tokens ──────────────────────────────────────────────────────────────
 import { INSIGHTS_PALETTE } from './palette';
-const SPENDING_COLOR = INSIGHTS_PALETTE[0]; // blue‑teal
-const SAVINGS_COLOR = INSIGHTS_PALETTE[1]; // light blue
-const GRID_COLOR = 'rgba(255,255,255,0.06)';
-const AXIS_COLOR = '#6b7280';
+const SPENDING_COLOR = INSIGHTS_PALETTE[0];
+const SAVINGS_COLOR  = INSIGHTS_PALETTE[1];
+const GRID_COLOR     = 'rgba(255,255,255,0.06)';
+const AXIS_COLOR     = '#6b7280';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function CustomTooltip({ active, payload, label }: TooltipContentProps<any, any>) {
@@ -47,7 +51,7 @@ function CustomTooltip({ active, payload, label }: TooltipContentProps<any, any>
     return (
         <div className="rounded-xl border border-white/10 bg-[#1a1a1a] px-4 py-3 shadow-2xl text-sm min-w-[160px]">
             <p className="text-gray-400 font-medium mb-2">{label ?? ''}</p>
-            {payload.map((entry, index) => (
+            {payload.map((entry: any) => (
                 <div key={entry.name} className="flex items-center justify-between gap-4 py-0.5">
                     <div className="flex items-center gap-2">
                         <span
@@ -57,7 +61,7 @@ function CustomTooltip({ active, payload, label }: TooltipContentProps<any, any>
                         <span className="text-gray-300 capitalize">{entry.name}</span>
                     </div>
                     <span className="font-bold text-white">
-                        ${(entry.value as number).toLocaleString()}
+                        ${(entry.value ?? 0).toLocaleString()}
                     </span>
                 </div>
             ))}
@@ -85,7 +89,7 @@ function CustomLegend() {
         <div className="flex items-center justify-center gap-6 mt-2">
             {[
                 { color: SPENDING_COLOR, label: 'Spending' },
-                { color: SAVINGS_COLOR, label: 'Savings' },
+                { color: SAVINGS_COLOR,  label: 'Savings'  },
             ].map(({ color, label }) => (
                 <div key={label} className="flex items-center gap-2">
                     <span className="inline-block w-3 h-3 rounded-sm" style={{ backgroundColor: color }} />
@@ -94,11 +98,6 @@ function CustomLegend() {
             ))}
         </div>
     )
-}
-
-function useReducedMotion() {
-    if (typeof window === 'undefined') return false
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches
 }
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -110,10 +109,12 @@ interface SpendingVsSavingsChartProps {
 function SpendingVsSavingsChartInner({
     data = MOCK_SPENDING_VS_SAVINGS,
 }: SpendingVsSavingsChartProps) {
-    const reducedMotion = useReducedMotion()
+    // Use the canonical hook — reactive, SSR-safe, shared across the codebase.
+    const reducedMotion = usePrefersReducedMotion()
+
     const savingsRate = useMemo(() => {
         const spending = data.reduce((s, d) => s + d.spending, 0)
-        const savings  = data.reduce((s, d) => s + d.savings, 0)
+        const savings  = data.reduce((s, d) => s + d.savings,  0)
         return Math.round((savings / (spending + savings)) * 100)
     }, [data])
 
@@ -189,14 +190,16 @@ function SpendingVsSavingsChartInner({
                         />
                         <Tooltip content={CustomTooltip as any} cursor={{ fill: 'rgba(255,255,255,0.03)' }} />
                         <Bar dataKey="spending" name="spending" fill={SPENDING_COLOR} radius={[4, 4, 0, 0]} isAnimationActive={!reducedMotion} />
-                        <Bar dataKey="savings" name="savings" fill={SAVINGS_COLOR} radius={[4, 4, 0, 0]} isAnimationActive={!reducedMotion} />
+                        <Bar dataKey="savings"  name="savings"  fill={SAVINGS_COLOR}  radius={[4, 4, 0, 0]} isAnimationActive={!reducedMotion} />
                     </BarChart>
                 </ResponsiveContainer>
             </div>
+
             {/* Screen‑reader summary */}
             <p className="sr-only" aria-live="polite">
                 {chartSummary}
             </p>
+
             <CustomLegend />
         </div>
     )

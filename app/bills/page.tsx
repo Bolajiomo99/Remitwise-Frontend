@@ -21,9 +21,9 @@ import { CTA_TEST_IDS } from "@/lib/cta-testids";
 import { useClientTranslator } from "@/lib/i18n/client";
 
 type AddBillResponse = ActionState & {
-	name?: string;
-	amount?: number;
-	dueDate?: string;
+    name?: string;
+    amount?: number;
+    dueDate?: string;
 };
 
 const getBillStages = (t: any) => [
@@ -80,21 +80,18 @@ const getBillQueue = (t: any) => [
 
 const weekDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
-// Minimal mock bills placeholder for client-side warning behavior in dev/test
-const mockBills: Bill[] = [];
-
 function ordinalDay(day: string) {
-	const value = Number(day);
-	const suffix =
-		value % 10 === 1 && value % 100 !== 11
-			? "st"
-			: value % 10 === 2 && value % 100 !== 12
-				? "nd"
-				: value % 10 === 3 && value % 100 !== 13
-					? "rd"
-					: "th";
+    const value = Number(day);
+    const suffix =
+        value % 10 === 1 && value % 100 !== 11
+            ? "st"
+            : value % 10 === 2 && value % 100 !== 12
+                ? "nd"
+                : value % 10 === 3 && value % 100 !== 13
+                    ? "rd"
+                    : "th";
 
-	return `${value}${suffix}`;
+    return `${value}${suffix}`;
 }
 
 export default function Bills() {
@@ -214,12 +211,12 @@ export default function Bills() {
 		return () => controller.abort();
 	}, [fetchBillsData, reloadKey]);
 
-	function handleAddBill() {
-		formSectionRef.current?.scrollIntoView({
-			behavior: "smooth",
-			block: "start",
-		});
-	}
+    function handleAddBill() {
+        formSectionRef.current?.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+        });
+    }
 
 	return (
 		<div className='min-h-screen bg-[#010101]'>
@@ -253,15 +250,15 @@ export default function Bills() {
 							<BillPaymentsStatsCards stats={stats} />
 						</section>
 
-						<div className='mb-8'>
-							<UnpaidBillsSection bills={bills} />
-						</div>
+                        <div className='mb-8'>
+                            <UnpaidBillsSection bills={bills} />
+                        </div>
 
-						<div className='mb-8'>
-							<RecentPaymentsSection bills={bills} />
-						</div>
-					</>
-				)}
+                        <div className='mb-8'>
+                            <RecentPaymentsSection bills={bills} />
+                        </div>
+                    </>
+                )}
 
 				<div className='grid gap-8 xl:grid-cols-[minmax(0,1.1fr)_360px] xl:items-start'>
 					<div
