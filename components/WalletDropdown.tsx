@@ -300,6 +300,7 @@ export default function WalletDropdown({
               type="button"
               role="menuitem"
               onClick={onConnect}
+              disabled={isConnecting}
               className={`w-full rounded-3xl bg-brand-red px-4 py-3 text-sm font-semibold text-white hover:bg-[#d33a3a] focus:outline-none focus:ring-2 focus:ring-brand-red/50 ${motionClass}`}
             >
               {isConnecting ? (
