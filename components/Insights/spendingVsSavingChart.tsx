@@ -1,6 +1,7 @@
-'use client'
+ 'use client'
 
 import { useMemo, memo } from 'react'
+import { usePrefersReducedMotion } from '@/lib/hooks/usePrefersReducedMotion'
 import {
     BarChart,
     Bar,

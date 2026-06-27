@@ -1,6 +1,7 @@
 'use client'
 
 import { useId, useState, useMemo, memo } from 'react'
+import { usePrefersReducedMotion } from '@/lib/hooks/usePrefersReducedMotion'
 import {
   PieChart,
   Pie,
